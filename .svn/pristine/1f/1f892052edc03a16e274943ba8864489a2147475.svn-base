@@ -1,0 +1,14 @@
+<div class="wrapper">
+    <div class="container">
+        <div class="container-top-box">
+            <div class="contents-title"><span>UPS 모니터링</span></div>
+            <div class="contents-text"><p>UPS 데이터 정보를 관리하세요.</p></div>
+        </div>
+        <div class="container-bottom-box">
+            <div id="grid" style="width: 100%; height: 716px;"></div>
+        </div>
+    </div>
+</div>
+
+
+

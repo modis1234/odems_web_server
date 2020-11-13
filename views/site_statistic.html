@@ -1,0 +1,139 @@
+<div class="wrapper">
+    <div class="container site-statisic-container">
+        <div class="container-top-box site-statistic-top-box">
+            <div class="contents-title"><span>현장별 통계</span></div>
+            <div class="contents-text"><p>현장별 등록현황과 장애발생 빈도,일시를 차트로 확인하세요.</p></div>
+        </div>
+        <div class="container-bottom-box">
+            <div class="site-left-box">
+                <div class="top-contents-box">
+                    <div class="top-title  component-box"><span class="component-title">현장 검색</span><span class="component-title">검색기간</span></div>
+                    <div class="top-contents">
+                        <div id="site_search_form"></div>
+                    </div>
+                </div>
+                <div class="bottom-contents-box">
+                    <div class="bottom-left-contents">
+                        <span class="component-title">등록현황</span>
+                        <ul id="deviceList-box">
+                            <li class="device-box" id="cctv-box">
+                                <div class="deviceIcon-box">
+                                    <span class="icon-text"><i class="fas fa-video"></i></span>
+                                </div>
+                                <div class="deviceText-box">
+                                    <div><span class="title-text">CCTV</span></div>
+                                    <div><span class="device-count">00</span></div>
+                                </div>
+                            </li>
+                            <li class="device-box" id="scanner-box">
+                                <div class="deviceIcon-box">
+                                    <span class="icon-text"><img src="/images/scanner_white.png" alt=""></span>
+                                </div>
+                                <div class="deviceText-box">
+                                    <div><span class="title-text">스캐너</span></div>
+                                    <div><span class="device-count">00</span></div>
+                                    
+                                </div>
+                            </li>
+                            <li class="device-box" id="ups-box">
+                                <div class="deviceIcon-box">
+                                    <span class="icon-text"><i class="fas fa-car-battery"></i></span>
+                                </div>
+                                <div class="deviceText-box">
+                                    <div><span class="title-text">UPS</span></div>
+                                    <div><span class="device-count">00</span></div>
+                                </div>
+                            </li>
+                            <li class="device-box" id="server-box">
+                                <div class="deviceIcon-box">
+                                    <span class="icon-text"><i class="fas fa-server"></i></span>
+                                </div>
+                                <div class="deviceText-box">
+                                    <div><span class="title-text">SERVER</span></div>
+                                    <div><span class="device-count">00</span></div>
+                                </div>
+                            </li>
+                            <li class="device-box" id="wifi-box">
+                                <div class="deviceIcon-box">
+                                    <span class="icon-text"><i class="fas fa-wifi"></i></span>
+                                </div>
+                                <div class="deviceText-box">
+                                    <div><span class="title-text">Wi-Fi</span></div>
+                                    <div><span class="device-count">00</span></div>
+                                </div>
+                            </li>
+                            <li class="device-box" id="repeater-box">
+                                <div class="deviceIcon-box">
+                                    <span class="icon-text"><i class="fas fa-satellite-dish"></i></span>
+                                </div>
+                                <div class="deviceText-box">
+                                    <div><span class="title-text">중계기(D-10)</span></div>
+                                    <div><span class="device-count">00</span></div>
+                                </div>
+                            </li>
+                            <li class="device-box"  id="gas-box">
+                                <div class="deviceIcon-box">
+                                    <span class="icon-text"><i class="fas fa-tachometer-alt"></i></span>
+                                </div>
+                                <div class="deviceText-box">
+                                    <div><span class="title-text">가스센서</span></div>
+                                    <div><span class="device-count">00</span></div>
+                                </div>
+                            </li>
+                            <li class="device-box"  id="nvr-box">
+                                <div class="deviceIcon-box">
+                                    <span class="icon-text"><i class="fas fa-hdd"></i></span>
+                                </div>
+                                <div class="deviceText-box">
+                                    <div><span class="title-text">NVR</span></div>
+                                    <div><span class="device-count">00</span></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bottom-right-contents">
+                        <div class="bottom-right-top-contents">
+                            <div class="contents-title"><span class="component-title">장애발생 후 복구는 잘 되고 있나요?</span></div>
+                            <div class="contents-box">
+                                <div class="contents-compo" id="error-count-box">
+                                    <span id='error-count-value'>00</span></br>
+                                    <span id='error-count-text'>발생횟수</span>
+                                </div>
+                                <div class="contents-compo" id="error-restore-box">
+                                    <span id='error-restore-value'>00</span></br>
+                                    <span id='error-restore-text'>복구횟수</span>
+                                </div>
+                                <div class="contents-compo" id="error-totalTime-box">
+                                    <span id='error-totalTime-value'>00</span></br>
+                                    <span id='error-totalTime-text'>누적시간</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bottom-right-bottom-contents">
+                            <div class="contents-title"><span class="component-title">가장 많이 장애발생 한 장비 타입은 무엇인가요?</span></div>
+                            <div class="contents-box">
+                                <div id="breakChart"></div>
+                            </div>
+                            <div class="device-wait-panel"><span id="wait-text">현장을 선택하세요.</span></div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="site-right-box">
+                <div class="site-right-title component-box">
+                    <span class="component-title">장비타입별 장애발생 시간</span>
+                </div>
+                <div class="site-right-contents">
+                    <div id="ganttdiv"></div>
+                    <div class="wait-panel"><span id="wait-text">현장을 선택하세요.</span></div>
+                    <div id="gantt-loading-panel" class="loadingio-spinner-spinner-f4vrrl26pe7" style="display: none;">
+                        <div class="ldio-anqtjg6x8v">
+                            <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>      
+    </div>
+</div>

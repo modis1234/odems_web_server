@@ -1,0 +1,159 @@
+var express = require('express');
+var router = express.Router();
+var request = require('request');
+
+var servers = require('./config/servers');
+
+
+
+
+
+/* GET users listing. */
+router.get('/networks', function(req, res, next) {
+    var geturl = servers.apisvr.url + '/api/network'
+    request.get({
+            url:geturl,
+            json: true
+        }, function(error, _res, body){
+        if(!error){
+            var _networks = _res.body;
+            res.json(_networks);
+        }else {
+            res.send(error);
+        }
+    });
+
+});
+
+router.post('/networks', function(req, res, next){
+    var posturl = servers.apisvr.url + '/api/network';
+    var reqBody = req.body;
+    
+    request.post({
+        url:posturl,
+        body:{
+            url: reqBody.url,
+            port: reqBody.port,
+            neType: reqBody.neType,
+            location: reqBody.location,
+            companyId: reqBody.companyId,
+            siteId: reqBody.siteId,
+            description: reqBody.description
+        },
+        json:true},
+    function(error, _res, _body){
+        if(!error){
+            console.log(_body);
+            reqBody["id"]=_body.insertId;
+
+            res.send(reqBody);
+            //res.redirect(servers.apisvr.url + '/api/network');
+        }else{
+            res.status(404).end();
+        }
+    });
+});
+
+router.put('/networks/:id', function(req, res, next){
+    var _id = req.params.id;
+    var reqBody = req.body;
+    var puturl  = servers.apisvr.url + '/api/network/'+_id;
+    console.log(reqBody);
+    request.put({
+        url: puturl,
+        body: {
+            url: reqBody.url,
+            port: reqBody.port,
+            neType: reqBody.neType,
+            location: reqBody.location,
+            companyId: reqBody.companyId,
+            siteId: reqBody.siteId,
+            description: reqBody.description
+        },
+        json:true
+    }, function(error, _res, _body) {
+        if(!error){
+            console.log(_body);
+            res.send(reqBody);
+        }else {
+            res.status(404).end();
+        }
+    });
+
+});
+
+router.delete('/networks/:id', function(req, res, next) {
+    var _id = req.params.id;
+    var deleteurl = servers.apisvr.url + '/api/network/'+_id;
+    console.log(_id);
+    request.delete({
+        url: deleteurl,
+        body: {},
+        json: true
+    }, function(error, _res,_body) {
+        if(!error) {
+            res.send(_body);
+        }else {
+            res.status(404).end();
+        }
+    });
+});
+
+//사이트 모니터링
+router.get('/networks/site', function(req, res, next){
+    var siteurl = servers.apisvr.url +'/api/network/site';
+    request.get({
+        url:siteurl,
+        json: true
+    }, function(error, _res, body){
+        if(!error){
+            var _siteList = _res.body;
+
+            var siteCntList =[];
+            //var siteObj = {id:1, site_name:"대곡-소사", connetUrl:"http://..", bleScanner:0,cctv:0 ,nvr:0 ,gas:0 ,ups:0 ,server:0 };
+            for(var i in _siteList){
+                var siteObj = {};
+                var _siteName = _siteList[i].site_name;
+                if(_siteName){
+                    siteObj.id = _siteList[i].site_id;
+                    siteObj.site_name=_siteName;
+                    var deviceType = _siteList[i].device_name;
+                    var siteIdx = siteCntList.findIndex((item, idx)=>{
+                        return item.id === _siteList[i].site_id;
+                    });
+                    if(siteIdx > -1){
+                        siteCntList[siteIdx][deviceType] = _siteList[i].neType_count;
+                    }
+                    else if(siteIdx === -1){
+                        siteObj[deviceType] = _siteList[i].neType_count; 
+                        siteCntList.push(siteObj);
+                    }
+                }
+            }
+            console.log(siteCntList);
+
+            res.json(siteCntList);
+        }else {
+            res.send(error);
+        }
+    });   
+});
+
+router.get('/networks/site/:id',function(req, res, next){
+    var _id = req.params.id;
+    var siteurl = servers.apisvr.url +'/api/network/site/'+_id;
+
+    request.get({
+        url:siteurl,
+        json: true
+    }, function(error, _res, body){
+        if(!error){
+            var _networks = _res.body;
+            res.json(_networks);
+        }else {
+            res.send(error);
+        }
+    });
+});
+
+module.exports = router;

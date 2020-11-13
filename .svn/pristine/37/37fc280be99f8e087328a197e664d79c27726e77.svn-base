@@ -1,0 +1,76 @@
+<div class="w2ui-page page-0">
+        <div class="w2ui-field">
+            <label> ID</label>
+        <div>
+               <input name="id" type="text" maxlength="100" size="10" readonly/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>공급업체</label>
+            <div>
+                <input name="comp_name" type="text" maxlength="100"/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>사이트</label>
+            <div>
+                <input name="site_name" type="text" maxlength="100" size="20" />
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>장비타입</label>
+            <div>
+                <input name="device_name" type="text" maxlength="100" size="20"/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>총 배터리량</label>
+            <div>
+                <input name="battery_capacity" type="text" maxlength="100" size="20"/>
+            </div>
+        </div>
+        <div class="w2ui-field" style="display: none;">
+            <label>최대 사용가능 전력</label>
+            <div>
+                <input name="max_power" type="text" maxlength="100" size="20"/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>URL</label>
+            <div>
+                <input name="url" type="text" maxlength="100" size="20"/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>PORT</label>
+            <div>
+                <input name="port" type="text" maxlength="100" size="10" maxlength="4"/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>접속주소</label>
+            <div>
+                <button id="connect-btn"><a href="#"><i class="fas fa-link">확인</i></a></button>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>이미지</label>
+            <div>
+                <form action="http://192.168.0.39:9090/upload/create" method="POST" enctype="multipart/form-data"> 
+                    <input name="imgFile" type="file" maxlength="100" size="10" maxlength="4"/>
+                    <input type="submit" id="uploadBtn" value="파일 업로드">                
+                </form>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>설치위치(상세설명)</label>
+            <div>
+                <input name="location" type="text" maxlength="100" size="30"/>
+            </div>
+        </div>
+    </div>
+    
+    <div class="w2ui-buttons">
+        <button class="w2ui-btn" name="reset" id="cancle-btn">리셋</button>
+        <button class="w2ui-btn" name="save" id="sava-btn">저장</button>
+    </div>

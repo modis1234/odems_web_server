@@ -1,0 +1,250 @@
+define([
+	"jquery",
+	"underscore",
+	"backbone",
+	"text!views/head",
+	"text!views/left",
+	"slimScroll",
+	"bootstrap",
+	"w2ui",
+	"css!cs/stylesheets/main.css"
+], function (
+	$,
+	_,
+	Backbone,
+	head,
+	left
+) {
+	var CompanyModel = Backbone.Model.extend({
+		url: '/company/companies',
+		parse: function (result) {
+			return result;
+		}
+	});
+	var SiteModel = Backbone.Model.extend({
+		url: '/site/sites',
+		parse: function (result) {
+			return result;
+		}
+	});
+	var DeviceModel = Backbone.Model.extend({
+		url: '/device/devices',
+		parse: function (result) {
+			return result;
+		}
+	});
+	var networkModel = Backbone.Model.extend({
+		url: '/network/networks/device/3',
+		parse: function(result){
+			return result;
+		}
+	});
+
+	return Backbone.View.extend({
+		el: 'body',
+		view: undefined,
+		company: undefined,
+		companyCombo: undefined,
+		site: undefined,
+		siteCombo: undefined,
+		device: undefined,
+		deviceCombo: undefined,
+		locationCombo: undefined,
+		target: undefined,
+		config: {
+			layout: {
+				name: 'layout',
+				panels: [
+					{ type: 'top', size: 50, style: 'border: 1px solid #dfdfdf; padding: 5px;', content: head },
+					{ type: 'left', size: 200, style: 'border: 1px solid #dfdfdf; padding: 5px;', content: left },
+					{ type: 'main', style: 'border: 1px solid #dfdfdf; padding: 5px;', content: 'main' }
+				]
+			}, // end layout
+			sidebar: {
+				name: 'sidebar',
+				nodes: [
+					{
+						id: 'monitorting', text: '모니터링', img: 'icon-folder', expanded: true, group: true, groupShowHide: false, collapsible:false,
+						nodes: [{ id: 'network', text: '디바이스', icon: 'fas fa-server' },
+						{ id: 'siteMonitor', text: '현장', icon: 'fas fa-tv' },
+						{ id: 'upsMonitor', text: 'UPS', icon: 'fas fa-plug' },
+						]
+					},
+					{
+						id: 'eventMenu', text: '조회|통계', img: 'icon-folder', expanded: true, group: true, groupShowHide: false, collapsible:false,
+						nodes: [{ id: 'netError', text: '장애이력 조회', icon: 'fas fa-pen' },
+						{ id: 'upsError', text: 'UPS이력 조회', icon: 'fas fa-pen' },
+						{ id: 'c', text: '통계', icon: 'fas fa-pen' }
+						]
+					},
+					{
+						id: 'management', text: '관리', img: 'icon-folder', expanded: true, group: true, groupShowHide: false, collapsible:false,
+						nodes: [{ id: 'device_mgt', text: '디바이스', icon: 'fas fa-pen' },
+						{ id: 'integrated_mgt', text: '건설사|현장|장비', icon: 'fas fa-pen' }
+						]
+					}
+				],
+				onClick: function(event){
+					var target = event.target;
+					window.main.setMain(target)
+				}
+			}
+		},
+		initialize: function () {
+			this.layoutLoad();
+			this.companyModel = new CompanyModel();
+			this.listenTo(this.companyModel, "sync", this.getCompanyList);
+			this.companyModel.fetch();
+
+			this.siteModel = new SiteModel();
+			this.listenTo(this.siteModel, "sync", this.getSiteList);
+			this.siteModel.fetch();
+
+			this.deviceModel = new DeviceModel();
+			this.listenTo(this.deviceModel, "sync", this.getDeviceList);
+			this.deviceModel.fetch();
+
+			this.networkModel = new networkModel();
+			this.listenTo(this.networkModel, "sync", this.getNetworkList);
+			this.networkModel.fetch();
+
+			this.utilsCustom();
+
+		},
+		getDeviceList: function (model, response) {
+			var _this = this;
+			var result = response;
+			_this.device = result;
+			_this.deviceCombo = [];
+			var initAll = { id:0, text:'전체', value:0 }
+			_this.deviceCombo.push(initAll);
+			for( i in result){
+				var obj = {};
+				obj.id = result[i].device_name;
+				obj.text = result[i].device_name;
+				obj.value = result[i].id;
+				_this.deviceCombo.push(obj);
+			}
+		},
+		getCompanyList: function (model, response) {
+			var _this = this;
+			var result = response;
+			_this.company = result;
+			_this.companyCombo=[];
+			var initAll = { id:0, text:'전체', value:0 }
+			_this.companyCombo.push(initAll);
+			for( i in result){
+				var obj = {};
+				obj.id = result[i].comp_name;
+				obj.text = result[i].comp_name;
+				obj.value = result[i].id;
+				_this.companyCombo.push(obj);
+			}
+		},
+		getSiteList: function (model, response) {
+			var _this = this;
+			var result = response;
+			_this.site = result;
+			_this.siteCombo=[];
+			var initAll = { id:0, text:'전체', value:0 }
+			_this.siteCombo.push(initAll);
+			for( i in result){
+				var obj = {};
+				obj.id = result[i].site_name;
+				obj.text = result[i].site_name;
+				obj.value = result[i].id;
+				obj.comp_id = result[i].comp_id;
+				obj.comp_name = result[i].comp_name;
+				_this.siteCombo.push(obj);
+			}
+						
+		},
+		getNetworkList: function (model, response) {
+			var _this = this;
+			var result = response;
+			_this.locationCombo =[]
+			for( i in result){
+				var obj = {};
+				obj.id = result[i].location;
+				obj.text = result[i].location;
+				obj.value = result[i].id;
+				obj.comp_id = result[i].comp_id;
+				obj.comp_name = result[i].comp_name;
+				obj.site_id = result[i].site_id;
+				obj.device_id = result[i].device_id;
+				obj.device_name = result[i].device_name;
+				obj.device_index = result[i].device_index;
+				_this.locationCombo.push(obj);
+			}
+						
+		},
+		layoutLoad: function () {
+			var _this = this;
+			var options = _this.config.layout;
+			this.$el.find("#layout").w2layout(options);
+			_this.renderMenu();
+		},
+		events: {
+			"click #logoutBtn": "logout",
+			"click #newPassword": "newPassword",
+			"click .logo": "menuToggle"
+		},
+		renderMenu: function () {
+			var _this = this;
+			var options = _this.config.sidebar;
+			var targetEl = _this.$el.find("#sidebar");
+			targetEl.w2sidebar(options);
+
+			_this.$el.find('#sidebar_sidebar_focus').remove();
+
+			// window.w2ui[options['name']].disable('ups');
+			window.w2ui[options['name']].disable('c');
+			_this.$el.find("#node_network").trigger('click');
+
+		
+		},
+		setMain: function (target) {
+			var _this = this;
+			var _target = target;
+			//_this.target = menu;
+			if( _this.target == _target ){
+				return false;
+			} else {
+				_this.target = _target;
+				var view = this.view;
+				if (view) {
+					view.destroy();
+				}
+				var url = _target;
+				requirejs([
+					'js/' + url
+				], function(View){
+					var view = new View();
+					_this.view = view;
+				});
+			}
+
+		},
+		logout: function () {
+			location.replace('/');
+
+		},
+		utilsCustom: function() {
+			var _shortMonths = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+			var _fullmonths = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+			var _shortDays = ['월', '화', '수', '목', '금', '토', '일'];
+			var _fulldays = ['월', '화', '수', '목', '금', '토', '일'];
+
+			window.w2utils.settings.shortmonths = _shortMonths;
+			window.w2utils.settings.fullmonths = _fullmonths;
+			window.w2utils.settings.shortdays = _shortDays;
+			window.w2utils.settings.fulldays = _fulldays;
+
+		},
+		newPassword: function () {
+			$(".content-box").remove();
+			$('.content-wrapper').load("/admin/newpassword")
+			$(".menu-box.active").removeClass("active");
+		}
+	});
+});

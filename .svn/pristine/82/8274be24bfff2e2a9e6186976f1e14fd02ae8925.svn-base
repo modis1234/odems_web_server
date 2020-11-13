@@ -1,0 +1,87 @@
+<div class="w2ui-page page-0">
+        <div class="w2ui-field">
+            <label> ID</label>
+        <div>
+               <input name="id" type="text" maxlength="100" size="10" readonly/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>건설사</label>
+            <div>
+                <input name="comp_name" type="text" maxlength="100"/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>현장</label>
+            <div>
+                <input name="site_name" type="text" maxlength="100" size="20" />
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>장비타입</label>
+            <div>
+                <input name="device_name" type="text" maxlength="100" size="20"/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>총 배터리량</label>
+            <div>
+                <input name="battery_capacity" type="text" maxlength="100" size="20"/>
+            </div>
+        </div>
+        <div class="w2ui-field" style="display: none;">
+            <label>최대 사용가능 전력</label>
+            <div>
+                <input name="max_power" type="text" maxlength="100" size="20"/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>URL</label>
+            <div>
+                <input name="url" type="text" maxlength="100" size="20"/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>PORT</label>
+            <div>
+                <input name="port" type="text" maxlength="100" size="10" maxlength="4"/>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>접속주소</label>
+            <div>
+                <button id="connect-btn"><a href="#"><i class="fas fa-link">확인</i></a></button>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>이미지</label>
+            <div>
+                <input type="text" name="image_path" style="display: none;" >
+
+                <div class="image-box" id='imageInput-box'>
+                    <input type="text" id="fileName" class="file_input_textbox" readonly >
+
+                    <!-- <input type="text" id="fileName" class="file_input_textbox" readonly > -->
+                    <form id="form"> 
+                        <div class="file_input_div">
+                            <img src="./images/search.png" class="file_input_img_btn" alt="open" />
+                            <!-- <input type="file" name="imgFile" class="file_input_hidden" onchange="javascript: document.getElementById('fileName').value = this.value"/> -->
+                            <input type="file" name="imgFile" class="file_input_hidden"/>
+
+                        </div>     
+                    </form>           
+                </div>
+            </div>
+        </div>
+        <div class="w2ui-field">
+            <label>설치위치(상세설명)</label>
+            <div>
+                <input name="location" type="text" maxlength="100" size="30" style="width: 360px;"/>
+            </div>
+        </div>
+    </div>
+    
+    <div class="w2ui-buttons">
+        <button class="w2ui-btn" name="reset" id="cancle-btn">리셋</button>
+        <button class="w2ui-btn" name="save" id="sava-btn">저장</button>
+    </div>

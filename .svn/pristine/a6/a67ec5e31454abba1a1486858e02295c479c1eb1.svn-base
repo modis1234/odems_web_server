@@ -1,0 +1,119 @@
+define([
+	"jquery",
+	"underscore",
+	"backbone",
+	"text!views/head",
+	"text!views/left",
+	"slimScroll",
+	"bootstrap",
+	"w2ui",
+	"css!cs/stylesheets/main.css"
+], function(
+	$,
+	_,
+    Backbone,
+	head,
+	left
+) {
+		
+	return Backbone.View.extend({
+		el: 'body',
+		view: undefined,
+		target: undefined,
+		selectNode: undefined,
+		initialize: function() {
+			this.layoutLoad();
+
+		
+
+		},
+		layoutLoad: function() {
+			var _this = this;
+			var pstyle = 'border: 1px solid #dfdfdf; padding: 5px;';
+			this.$el.find("#layout").w2layout({
+                name: 'layout',
+                panels: [
+                    { type: 'top', size: 50, style: pstyle, content: head},
+                    { type: 'left', size: 200, style: pstyle, content: left },
+                    { type: 'main', style: pstyle, content: 'main' }
+                ]
+			});
+			_this.renderMenu();
+		},
+		events: {
+			"click .w2ui-node-sub" : "setMain",
+        	"click #logoutBtn": "logout",
+        	"click #newPassword": "newPassword",
+        	"click .logo": "menuToggle",
+
+		},
+		renderMenu: function(){
+			var _this=this;
+			var targetEl = _this.$el.find("#sidebar"); 
+			targetEl.w2sidebar({
+				name: 'sidebar',
+				nodes: [
+					{ id: 'monitorting', text: '모니터링', img: 'icon-folder', expanded: true, group: true,
+					  nodes: [ { id: 'network', text: '디바이스', icon: 'fas fa-server' },
+							   { id: 'siteMonitor', text: '사이트', icon: 'fas fa-tv' },
+							   { id: 'ups', text: 'UPS', icon: 'fas fa-plug' },
+							 ]
+					},
+					{ id: 'eventMenu', text: '관리', img: 'icon-folder', expanded: true, group: true,
+					  nodes: [ { id: 'a', text: '장애이력 조회', icon: 'fas fa-pen' },
+							   { id: 'b', text: 'UPS이력 조회', icon: 'fas fa-pen' },
+							   { id: 'c', text: '통계', icon: 'fas fa-pen' }
+							 ]
+					},
+					{ id: 'management', text: '관리', img: 'icon-folder', expanded: true, group: true,
+					  nodes: [ { id: 'device_mgt', text: '디바이스', icon: 'fas fa-pen' },
+							   { id: 'integrated_mgt', text: '건설사|현장|장비', icon: 'fas fa-pen' }
+							 ]
+					}
+				
+				],
+				onClick: function(evt){
+				   console.log(evt.target);
+					
+					_this.setMain(evt);
+				 
+
+
+				},
+			});
+		},
+        setMain : function(evt) {
+			console.log(evt.target);
+        	var _this = this;
+        	var target = this.target
+        	if(target == evt.target) return;
+			this.target = evt.target;
+        	var view = this.view;
+        	if(view) view.destroy();
+			var url = evt.target;
+        	var _title =$(evt.target).text();
+        	requirejs([
+        		'js/' + url
+        	], function(View) {
+        		//_this.$el.find('.wrapper .content').empty();
+        		_this.$el.find('#layout_layout_panel_main .w2ui-panel-content').empty();
+			
+				var view = new View();
+				_this.view = view;
+				console.log(view);
+		
+        	});
+        	
+        },
+        logout: function() {
+        	location.replace('/');
+        	
+        },
+        newPassword: function() {
+        	$(".content-box").remove();
+			$('.content-wrapper').load("/admin/newpassword")
+			$(".menu-box.active").removeClass("active");
+        },
+       
+	});
+});

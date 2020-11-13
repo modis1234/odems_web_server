@@ -1,0 +1,15 @@
+<div class="wrapper">
+    <div class="container">
+        <div class="container-top-box">
+            <div class="contents-title"><span>현장 모니터링</span></div>
+            <div class="contents-text"><p>현장(통합안전시스템) 그룹으로 등록된 디바이스 현황과 상태를 점검하세요.</p></div>
+        </div>
+        <div class="container-bottom-box">
+            <div id="siteGrid" style="width: 50%; height: 716px;"></div>
+            <div id="detailGrid" style="width: 50%; height: 716px;"></div>
+        </div>
+    </div>
+</div>
+
+
+

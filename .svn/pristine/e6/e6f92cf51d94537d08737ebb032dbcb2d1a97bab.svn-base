@@ -1,0 +1,503 @@
+.w2ui-panel-content .wrapper {
+    height: 100%;
+}
+
+.w2ui-panel-content .container {
+    width: 100%;
+    height: 100%;
+}
+.w2ui-panel-content .container .container-top-box {
+    height: 10%;
+}
+
+.w2ui-panel-content .container .container-bottom-box {
+    height: 90%;
+}
+.w2ui-overlay .w2ui-grid-searches table td.operator {
+    display: none ;
+}
+
+.container-bottom-box div#siteGrid {
+    float: left;
+    right: 5px;
+}
+
+.container-bottom-box div#detailGrid {
+    float: right;
+}
+.w2ui-grid-data[align='left'] {
+    padding-left: 22px !important;
+}
+.w2ui-grid-data[align='right'] {
+    padding-right: 10px !important;
+}
+.header_container {
+    margin-top: 8px;
+    margin-left: 10px;
+}
+span.title {
+    text-align: left;
+    color: #555555;
+    font-size: 18px;
+}
+
+.contents-title span {
+    font-size: 20px;
+    font-weight: bold;
+}
+.contents-title {
+    margin-top: 13px;
+}
+.contents-text p {
+    font-size: 14px;
+    color: #555555;
+}
+.contents-text {
+    padding-top: 5px;
+}
+
+/* 디바이스 조회 */
+#tb_grid_toolbar_item_w2ui-search{
+    display: none !important;
+}
+
+/* 디바이스관리 */
+.container-bottom-box .left-box {
+    float: left;
+    width: 50%;
+    height: 90%;
+    margin-top: 8px;
+}
+.container-bottom-box .right-box {
+    float: left;
+    width: 49%;
+    height: 90%;
+    margin-left: 8px;
+    margin-top: 8px;
+}
+.container-bottom-box .right-box .right-top-box {
+    width: 100%;
+    height: 39%;
+
+}
+.container-bottom-box .right-box .right-bottom-box {
+    width: 100%;
+    height: 61%;
+}
+
+.right-bottom-box .contents-box{
+    width: 100%; 
+    height: 6%;
+}
+
+#newDeviceText {
+    position: relative;
+    top: 239px;
+}
+
+#inputForm .w2ui-field:nth-child(1)>div::after{
+    content:'*자동등록합니다.';
+}
+/* #inputForm .w2ui-field:nth-child(2)>div::after{
+    content:'*공급업체와 사이트는 함께 등록할 수 있습니다.';
+} */
+div#inputForm {
+    height: 474px;
+}
+div#newDeviceGrid {
+    width: 819px !important;
+    height: 173px !important;
+    top: 226px !important;
+}
+
+/* .w2ui-field:nth-child(5)>div::after{
+    content:'*ex) http://~.';
+} */
+#inputForm .w2ui-field:nth-child(8)>div::after{
+    content:'*숫자만 입력가능합니다.';
+}
+#inputForm .w2ui-field:nth-child(9)>div::after{
+    content:'*URL,PORT 등록후 버튼을 눌러 확인해주세요.';
+}
+#inputForm .w2ui-field>div::after{
+    position: absolute;
+    margin-top: 7px;
+    margin-left: 16px;
+    color: red;
+}
+div#inputForm  .w2ui-page.page-0 {
+    padding-top: 55px;
+    padding-left: 99px;
+}
+
+
+/* w2uiForm.html */
+
+.w2ui-buttons #sava-btn{
+    background-image: linear-gradient(#73b6f0 0,#2391dd 100%);
+    color: #fff;
+}
+div#w2ui-overlay {
+    min-width: 205px !important;
+}
+
+/* 통합 관리 */
+button#checked_btn {
+    position: absolute;
+    bottom: 28px;
+    width: 90px;
+    height: 24px;
+    left: 536px;
+}
+button#checked_btn[value="companyForm"],
+button#checked_btn[value="deviceInfoForm"] {
+    top: 80px;
+}
+button#checked_btn[value="siteForm"] {
+    top: 87px;
+}
+#integratedForm[name="companyForm"] .w2ui-column-container,
+#integratedForm[name="deviceInfoForm"] .w2ui-column-container {
+    margin-top: 35px !important;
+    margin-left: 37px !important;
+}
+#integratedForm[name="siteForm"] .w2ui-column-container {
+    margin-top: 9px !important;
+    margin-left: 37px !important;
+}
+
+.device-left-box .w2ui-field:nth-child(5){
+    display: none !important;
+}
+.device-left-box .w2ui-field:nth-child(6){
+    display: none !important;
+}
+
+#dataGrid {
+    height: 100%;
+    width: 100%;
+}
+#integratedForm {
+    height: 254px;
+    width: 100%;
+}
+#newDataGrid {
+    height: 414px;
+    width: 100%;
+}
+#checked_btn{
+    width: 90px !important;
+    height: 24px;
+}
+
+#integratedForm .w2ui-field:nth-child(1)>div::after{
+    content:'*자동등록합니다.';
+    position: absolute;
+    margin-top: 7px;
+    margin-left: 16px;
+    color: red;
+}
+#dataGrid .w2ui-grid-columns .w2ui-head:nth-child(2) {
+    padding-left: 9px !important;
+}
+#dataGrid .w2ui-grid-columns .w2ui-head:nth-child(3),
+#dataGrid .w2ui-grid-columns .w2ui-head:nth-child(4),
+#dataGrid .w2ui-grid-columns .w2ui-head:nth-child(5) {
+    padding-left: 22px !important;
+}
+#newDataGrid .w2ui-grid-columns .w2ui-head:nth-child(2) {
+    padding-left: 9px !important;
+}
+#newDataGrid .w2ui-grid-columns .w2ui-head:nth-child(3),
+#newDataGrid .w2ui-grid-columns .w2ui-head:nth-child(4),
+#newDataGrid .w2ui-grid-columns .w2ui-head:nth-child(5) {
+    padding-left: 22px !important;
+}
+
+/* 파일 버튼 */
+.file_input_textbox {
+    float:left; 
+    height:29px;
+}
+.file_input_div {
+    position:relative; 
+    width:80px; 
+    height:36px; 
+    overflow:hidden;
+}
+.file_input_img_btn {
+    padding:0 0 0 5px;
+}
+.file_input_hidden {
+    font-size:29px; 
+    position:absolute; 
+    right:0px; 
+    top:0px; 
+    opacity:0; 
+    filter: alpha(opacity=0); 
+    -ms-filter: alpha(opacity=0); 
+    cursor:pointer;
+}
+
+input#fileName {
+    height: 22px;
+    border: 1px solid #cacaca;
+    border-radius: 3px;
+    color: #000;
+    background-color: #fff;
+    line-height: normal;
+}
+form#form {
+    height: 24px;
+}
+img.file_input_img_btn {
+    margin-left: 4px;
+    position: absolute;
+    bottom: 11px;
+}
+
+/* 장애이력 조회 */
+.netError-left-box {
+    float: left;
+    width: 21%;
+    height: 100%;
+}
+.netError-right-box {
+    float: left;
+    width: 70%;
+    height: 100%;
+}
+#netError_form {
+    width: 344px;
+    height: 395px;
+}
+#netError_grid {
+    width: 1327px;
+    height: 678px;
+}
+#netError_grid div p {
+    font-size: 12px;
+}
+#netError_grid div {
+    font-size: 12px;
+}
+#netError_form input{
+    height: 25px !important;
+}
+#netError_form .w2ui-field {
+    margin-top: 20px;
+}
+#netError_form .w2ui-field:nth-child(3) {
+    margin-top: 10px !important;
+}
+#netError_form .w2ui-page.page-0 {
+    padding-top: 15px;
+}
+.netError-left-box .w2ui-field>label {
+    width: 80px;
+}
+.netError-left-box .w2ui-field>div {   
+    margin-left: 90px;
+}
+.date-setting .w2ui-btn {
+    min-width: 50px !important;
+    height: 25px;
+    padding: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+button#download-btn {
+    min-width: 27px;
+    min-height: 27px;
+    padding: 0px;
+}
+.netError-left-box #startDate {
+    width: 82px;
+}
+.netError-left-box #endDate {
+    width: 82px;
+}
+.netError-left-box #companyList {
+    width: 180px;
+}
+.netError-left-box #siteList {
+    width: 180px;
+}
+.netError-left-box #deviceList{
+    width: 180px;
+}
+
+/* cursor */
+.w2ui-level-0 {
+    cursor: pointer;
+}
+button.w2ui-btn{
+    cursor: pointer !important;
+}
+div#tabs .w2ui-tab {
+    cursor: pointer !important;
+}
+
+@media screen and (max-height: 969px) {
+    .w2ui-panel-content {
+        overflow: hidden !important;
+    }
+
+}
+
+/* UPS이력 조회 */
+.upsError-left-box {
+    float: left;
+    width: 20%;
+    height: 100%;
+}
+.upsError-right-box {
+    float: left;
+    width: 71%;
+    height: 100%;
+}
+#upsError_form {
+    /* width: 344px; */
+    width: 330px;
+    height: 395px;
+}
+#upsError_grid {
+    width: 1341px;
+    height: 678px;
+}
+#upsError_grid .w2ui-grid-data[align='left'] {
+    padding-left: 5px !important;
+}
+/* #upsError_grid div p {
+    font-size: 13px;
+}
+#upsError_grid div {
+    font-size: 13px;
+} */
+#upsError_form input{
+    height: 25px !important;
+}
+#upsError_form .w2ui-field {
+    margin-top: 20px;
+}
+#upsError_form .w2ui-field:nth-child(3) {
+    margin-top: 10px !important;
+}
+#upsError_form .w2ui-page.page-0 {
+    padding-top: 15px;
+}
+.upsError-left-box .w2ui-field>label {
+    width: 80px;
+}
+.upsError-left-box .w2ui-field>div {   
+    margin-left: 90px;
+}
+.upsError-left-box #startDate {
+    width: 82px;
+}
+.upsError-left-box #endDate {
+    width: 82px;
+}
+.upsError-left-box #companyList {
+    width: 180px;
+}
+.upsError-left-box #siteList {
+    width: 180px;
+}
+.upsError-left-box #deviceList{
+    width: 180px;
+}
+
+#upsError_form input#location {
+    width: 180px;
+}
+/* #upsError_form .w2ui-field:nth-child(6) {
+    display: none !important;
+} */
+
+/* UPS이력조회 컬럼타이틀 css */
+#upsError_grid .w2ui-head:nth-child(4) > .w2ui-col-header {
+    text-align: left;
+}
+
+#upsError_grid .w2ui-head:nth-child(2) > .w2ui-col-header,
+#upsError_grid .w2ui-head:nth-child(3) > .w2ui-col-header,
+#upsError_grid .w2ui-head:nth-child(5) > .w2ui-col-header,
+#upsError_grid .w2ui-head:nth-child(6) > .w2ui-col-header,
+#upsError_grid .w2ui-head:nth-child(7) > .w2ui-col-header,
+#upsError_grid .w2ui-head:nth-child(8) > .w2ui-col-header,
+#upsError_grid .w2ui-head:nth-child(9) > .w2ui-col-header,
+#upsError_grid .w2ui-head:nth-child(10) > .w2ui-col-header,
+#upsError_grid .w2ui-head:nth-child(11) > .w2ui-col-header,
+#upsError_grid .w2ui-head:nth-child(12) > .w2ui-col-header {
+    text-align: right;
+}
+
+/* 장애이력조회 컬럼타이틀 css */
+#netError_grid .w2ui-head:nth-child(5) > .w2ui-col-header {
+    text-align: left;
+}
+
+
+#netError_grid .w2ui-head:nth-child(2) > .w2ui-col-header,
+#netError_grid .w2ui-head:nth-child(3) > .w2ui-col-header,
+#netError_grid .w2ui-head:nth-child(4) > .w2ui-col-header,
+#netError_grid .w2ui-head:nth-child(6) > .w2ui-col-header,
+#netError_grid .w2ui-head:nth-child(7) > .w2ui-col-header,
+#netError_grid .w2ui-head:nth-child(8) > .w2ui-col-header {
+    text-align: right;
+}
+
+td#grid_netErrorGrid_column_3 {
+    padding-left: 20px;
+}
+
+/* 모니터링-디바이스 컬럼타이틀 css */
+#grid .w2ui-head:nth-child(3) > .w2ui-col-header,
+#grid .w2ui-head:nth-child(5) > .w2ui-col-header {
+    text-align: left;
+}
+
+td#grid_networkGrid_column_2,
+td#grid_networkGrid_column_3 {
+    padding-left: 20px;
+}
+
+#grid .w2ui-head:nth-child(7) > .w2ui-col-header,
+#grid .w2ui-head:nth-child(6) > .w2ui-col-header {
+    text-align: center;
+}
+
+#grid .w2ui-head:nth-child(2) > .w2ui-col-header,
+#grid .w2ui-head:nth-child(3) > .w2ui-col-header,
+#grid .w2ui-head:nth-child(8) > .w2ui-col-header,
+#grid .w2ui-head:nth-child(9) > .w2ui-col-header {
+    text-align: right;
+}
+
+/* 모니터링-현장 컬럼타이틀 css */
+#siteGrid .w2ui-head:nth-child(2) > .w2ui-col-header,
+#siteGrid .w2ui-head:nth-child(3) > .w2ui-col-header,
+#siteGrid .w2ui-head:nth-child(4) > .w2ui-col-header,
+#siteGrid .w2ui-head:nth-child(5) > .w2ui-col-header,
+#siteGrid .w2ui-head:nth-child(6) > .w2ui-col-header,
+#siteGrid .w2ui-head:nth-child(7) > .w2ui-col-header,
+#siteGrid .w2ui-head:nth-child(8) > .w2ui-col-header,
+#siteGrid .w2ui-head:nth-child(9) > .w2ui-col-header {
+    text-align: center;
+}
+
+#detailGrid .w2ui-head:nth-child(4) > .w2ui-col-header,
+#detailGrid .w2ui-head:nth-child(5) > .w2ui-col-header {
+    text-align: center;
+}
+
+#detailGrid .w2ui-head:nth-child(2) > .w2ui-col-header,
+#detailGrid .w2ui-head:nth-child(6) > .w2ui-col-header,
+#detailGrid .w2ui-head:nth-child(7) > .w2ui-col-header {
+    text-align: right;
+}
+
+td#grid_detialGrid_column_1 {
+    padding-left: 20px;
+}

@@ -1,0 +1,210 @@
+define([
+	"jquery",
+	"underscore",
+	"backbone",
+	"text!views/head",
+	"text!views/left",
+	"slimScroll",
+	"bootstrap",
+	"w2ui",
+	"css!cs/stylesheets/main.css"
+], function (
+	$,
+	_,
+	Backbone,
+	head,
+	left
+) {
+	var CompanyModel = Backbone.Model.extend({
+		url: '/company/companies',
+		parse: function (result) {
+			return result;
+		}
+	});
+	var SiteModel = Backbone.Model.extend({
+		url: '/site/sites',
+		parse: function (result) {
+			return result;
+		}
+	});
+	var DeviceModel = Backbone.Model.extend({
+		url: '/device/devices',
+		parse: function (result) {
+			return result;
+		}
+	});
+
+	return Backbone.View.extend({
+		el: 'body',
+		view: undefined,
+		company: undefined,
+		companyCombo: undefined,
+		site: undefined,
+		siteCombo: undefined,
+		device: undefined,
+		deviceCombo: undefined,
+		target: undefined,
+		selectNode: undefined,
+		initialize: function () {
+			this.layoutLoad();
+			this.companyModel = new CompanyModel();
+			this.listenTo(this.companyModel, "sync", this.getCompanyList);
+			this.companyModel.fetch();
+
+			this.siteModel = new SiteModel();
+			this.listenTo(this.siteModel, "sync", this.getSiteList);
+			this.siteModel.fetch();
+
+			this.deviceModel = new DeviceModel();
+			this.listenTo(this.deviceModel, "sync", this.getDeviceList);
+			this.deviceModel.fetch();
+
+
+		},
+		getDeviceList: function (model) {
+			var _this = this;
+			var data = model.toJSON();
+			_this.deviceCombo = [];
+			var _deviceList = Object.keys(data).map(function (i) {
+				var obj = {};
+				obj.id = data[i].device_name;
+				obj.text = data[i].device_name;
+				obj.value = data[i].id;
+				_this.deviceCombo.push(obj);
+				return data[i];
+			});
+
+			window.device = _this.device = _deviceList;
+			window.deviceCombo = _this.deviceCombo;
+			_this.deviceCombo = undefined;
+
+
+		},
+		getCompanyList: function (model) {
+			var _this = this;
+			var data = model.toJSON();
+			_this.companyCombo=[];
+			var _compList = Object.keys(data).map(function (i) {
+				var obj = {};
+				obj.id = data[i].comp_name;
+				obj.text = data[i].comp_name;
+				obj.value = data[i].id;
+				_this.companyCombo.push(obj);
+				return data[i];
+			});
+
+			window.company = _this.company = _compList;
+			window.companyCombo = _this.companyCombo;
+			_this.companyCombo = undefined;
+			
+		},
+		getSiteList: function (model) {
+			var _this = this;
+			var data = model.toJSON();
+			_this.siteCombo=[];
+			var _siteList = Object.keys(data).map(function (i) {
+				var obj = {};
+				obj.id = data[i].site_name;
+				obj.text = data[i].site_name;
+				obj.value = data[i].id;
+				_this.siteCombo.push(obj);
+				return data[i];
+			});
+			window.site = _this.site = _siteList;
+			window.siteCombo = _this.siteCombo;
+			_this.siteCombo = undefined;
+			
+		},
+		layoutLoad: function () {
+			var _this = this;
+			var pstyle = 'border: 1px solid #dfdfdf; padding: 5px;';
+			this.$el.find("#layout").w2layout({
+				name: 'layout',
+				panels: [
+					{ type: 'top', size: 50, style: pstyle, content: head },
+					{ type: 'left', size: 200, style: pstyle, content: left },
+					{ type: 'main', style: pstyle, content: 'main' }
+				]
+			});
+			_this.renderMenu();
+		},
+		events: {
+			"click .w2ui-node-sub": "setMain",
+			"click #logoutBtn": "logout",
+			"click #newPassword": "newPassword",
+			"click .logo": "menuToggle",
+
+		},
+		renderMenu: function () {
+			var _this = this;
+			var targetEl = _this.$el.find("#sidebar");
+			targetEl.w2sidebar({
+				name: 'sidebar',
+				nodes: [
+					{
+						id: 'monitorting', text: '모니터링', img: 'icon-folder', expanded: true, group: true,
+						nodes: [{ id: 'network', text: '디바이스', icon: 'fas fa-server' },
+						{ id: 'siteMonitor', text: '사이트', icon: 'fas fa-tv' },
+						{ id: 'ups', text: 'UPS', icon: 'fas fa-plug' },
+						]
+					},
+					{
+						id: 'eventMenu', text: '관리', img: 'icon-folder', expanded: true, group: true,
+						nodes: [{ id: 'a', text: '장애이력 조회', icon: 'fas fa-pen' },
+						{ id: 'b', text: 'UPS이력 조회', icon: 'fas fa-pen' },
+						{ id: 'c', text: '통계', icon: 'fas fa-pen' }
+						]
+					},
+					{
+						id: 'management', text: '관리', img: 'icon-folder', expanded: true, group: true,
+						nodes: [{ id: 'device_mgt', text: '디바이스', icon: 'fas fa-pen' },
+						{ id: 'integrated_mgt', text: '건설사|현장|장비', icon: 'fas fa-pen' }
+						]
+					}
+
+				],
+				onClick: function (evt) {
+					console.log(evt.target);
+
+					_this.setMain(evt);
+
+
+
+				},
+			});
+		},
+		setMain: function (evt) {
+			console.log(evt.target);
+			var _this = this;
+			var target = this.target
+			if (target == evt.target) return;
+			this.target = evt.target;
+			var view = this.view;
+			if (view) view.destroy();
+			var url = evt.target;
+			console.log(evt.target);
+			var _title = $(evt.target).text();
+			requirejs([
+				'js/' + url
+			], function (View) {
+				//_this.$el.find('.wrapper .content').empty();
+				_this.$el.find('#layout_layout_panel_main .w2ui-panel-content').empty();
+
+				var view = new View();
+				_this.view = view;
+				console.log(view);
+
+			});
+
+		},
+		logout: function () {
+			location.replace('/');
+
+		},
+		newPassword: function () {
+			$(".content-box").remove();
+			$('.content-wrapper').load("/admin/newpassword")
+			$(".menu-box.active").removeClass("active");
+		}
+	});
+});

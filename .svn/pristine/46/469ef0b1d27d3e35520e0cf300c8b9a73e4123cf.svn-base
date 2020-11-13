@@ -1,0 +1,307 @@
+define([
+	"jquery",
+	"underscore",
+	"backbone",
+	"text!views/network",
+	"css!cs/stylesheets/main.css"	
+], function(
+	$,
+	_,
+	Backbone,
+	HTML
+) { 
+    var NetWorkModel = Backbone.Model.extend({ 
+		url: '/network/networks',
+        parse: function(result) {
+            return result;
+        }
+	});
+	
+	var CompanyModel = Backbone.Model.extend({ 
+        url: '/company/companies',
+        parse: function(result) {
+            return result;
+        }
+	});
+
+	var SiteModel = Backbone.Model.extend({ 
+        url: '/site/sites',
+        parse: function(result) {
+            return result;
+        }
+	});
+	
+	var DeviceTypeModel = Backbone.Model.extend({ 
+        url: '/device/devices',
+        parse: function(result) {
+            return result;
+        }
+	});
+	
+
+	return Backbone.View.extend({
+		el: '#layout_layout_panel_main .w2ui-panel-content',
+		gridName:undefined,
+		selectedRow: undefined,
+		company:undefined,
+		site:undefined,
+		deviceType:undefined,
+		location:[],
+		initialize: function() {
+			console.log("network.js");
+			this.$el.html(HTML);
+			this.drawGrid();
+			this.netWorkModel = new NetWorkModel();
+			this.listenTo(this.netWorkModel, "sync", this.getNetWorkList);
+			this.netWorkModel.fetch();
+
+			this.companyModel = new CompanyModel();
+			this.listenTo(this.companyModel, "sync", this.getCompanyList);
+			this.companyModel.fetch();
+
+			this.siteModel = new SiteModel();
+			this.listenTo(this.siteModel, "sync", this.getSiteList);
+			this.siteModel.fetch();
+
+			this.deviceTypeModel = new DeviceTypeModel();
+			this.listenTo(this.deviceTypeModel, "sync", this.getDeviceTypeList);
+			this.deviceTypeModel.fetch();
+
+		},
+		getDeviceTypeList: function(model){
+			var _this = this;
+			var data = model.toJSON();
+			_this.deviceType=[];
+			var _deviceTypeList = Object.keys(data).map(function(i){
+				var _deviceObj = data[i]["id"];
+				var _deviceName = data[i]["device_name"];
+				if(_deviceName){
+					_this.deviceType.push(_deviceName);
+				}
+				return data[i];
+			});
+			
+		},
+		getCompanyList: function(model) {
+			var _this = this;
+			var data = model.toJSON();
+			_this.company=[];
+			var _compList = Object.keys(data).map(function(i){
+				var _compName = data[i]["comp_name"];
+			    
+				if(_compName){
+					_this.company.push(_compName);
+				}
+
+				return data[i];
+			});
+
+		},
+		getSiteList: function(model) {
+			var _this = this;
+			var data = model.toJSON();
+			_this.site=[];
+			var _siteList = Object.keys(data).map(function(i){
+				var _siteName = data[i]["site_name"];
+				if(_siteName && _siteName !== "기타"){
+					_this.site.push(_siteName);
+				}
+
+				return data[i];
+			});
+			
+		},
+		getNetWorkList: function(model) {
+			var _this=this;
+			var data = model.toJSON();
+			//var _records=Object.values(data);
+
+			var _records = Object.keys(data).map(function(i){
+				var _location = data[i]["location"];
+				if(_location) {			
+					_this.location.push(_location);
+				}
+				var errorTime = data[i]["error_time"];
+				if(errorTime){
+					var errorDate =new Date(data[i]["error_time"]);
+					var _error_time = errorDate.toLocaleString();
+
+					data[i].error_time = '<span id="errorDate" style="color:red;">'+_error_time+'</span>'
+					var _termDate =_this.termCalc(errorDate);
+					data[i].error_delay_time = _termDate;
+				}
+				var _url = data[i]["url"];
+				var _port = data[i]["port"];
+				var _connURL = 'http://'+_url+":"+_port;
+				var _neType = data[i]["ne_type"];
+				if(_url && _port){
+					if(_neType !== 6){
+						var _connect = '<a href="'+_connURL+'" target="_blank"><i class="fas fa-link"></i></a>'
+						data[i].connURL = _connect;  
+
+					}
+				}
+				var _result = data[i]["result"];
+				var _iconClaz="";
+
+				if(_result){
+					if(_result === "closed"){
+						_iconClaz ="fa-times-circle";
+						_color ="#FD0100";
+					}
+					else if(_result === "open"){
+						_iconClaz ="fa-check-circle";
+						_color ="#21DF00";
+					}
+					var resultIcon = '<i class="fas '+_iconClaz+'" style="color:'+_color+';"></i>';
+					data[i].result = resultIcon;
+				}
+				var _siteName=data[i]["site_name"];
+				if(_siteName === "기타"){
+					 data[i].site_name = "";
+				}
+
+				return data[i];
+			});
+			w2ui[_this.gridName].records=_records;
+			w2ui[_this.gridName].render();
+
+			var toDate = new Date().toLocaleString();
+			_this.$el.find('#grid_'+_this.gridName+'_footer .w2ui-footer-left').html(toDate);
+
+			
+		},
+		termCalc: function(param){
+			var _fromDate = param;
+	
+			var toDay = new Date();
+			var fromDay = new Date(_fromDate.getFullYear(), _fromDate.getMonth(), _fromDate.getDate(),_fromDate.getHours(),_fromDate.getMinutes());
+			strPeriod = toDay.getTime() - fromDay.getTime();
+			pDay = strPeriod / (60*60*24*1000);
+			strDay = Math.floor(pDay);
+			pHour = (strPeriod - (strDay * (60*60*24*1000))) / (60*60*1000);
+			strHour = Math.floor(pHour);
+			strMinute = Math.floor((strPeriod - (strDay * (60*60*24*1000)) - (strHour * (60*60*1000))) / (60*1000));
+			if(strDay > 0){
+				strDay = strDay *24;
+				strHour = strHour+strDay;
+			}else{
+				strDay = 0;
+				strHour = strHour;
+			}
+			var termCalcDate = strHour + " 시간 " + strMinute + " 분";
+			//var termCalcDate = strDay + " 일 " + strHour + " 시간 " + strMinute + " 분";
+		
+			return termCalcDate;
+		},
+		drawGrid: function() {
+			var _this = this;
+			var _columnGroups = [
+				{ caption: '디바이스 정보', span: 5 },
+				{ caption: '점검', span: 3 }
+			];
+			var _colums = [
+				{ field: 'comp_name', caption: '공급업체', size: '10%', sortable: true, attr:"align=right" },
+				{ field: 'site_name', caption: '사이트', size: '10%', sortable: true, attr:"align=right" },
+				{ field: 'location', caption: '설치위치(상세설명)', size: '50%', attr:"align=left" },
+				{ field: 'device_name', caption: '타입', size: '10%', attr:"align=left" },
+				{ field: 'connURL', caption: '연결', size: '5%', attr:"align=center"},
+				{ field: 'result', caption: '상태', size: '10%',sortable: true, attr:"align=center" },
+				{ field: 'error_time', caption: '장애발생일시', size: '15%', sortable: true, attr:"align=right" },
+				{ field: 'error_delay_time', caption: '장애발생 누적시간', size: '15%',attr:"align=right" }
+			];
+
+			var _searches= [
+				{ field: 'comp_name', caption: '공급업체', type:'text' },
+				{ field: 'site_name', caption: '사이트명', type:'text' },
+				{ field: 'device_name', caption: '타입', type:'text' },
+				{ field: 'location', caption: '설치위치(상세설명)', type:'text' }
+			];
+
+			var _toobar={
+				items: [
+					// { type:"button", id:"resultClosed",caption:"장애발생", icon:'fas fa-times-circle'},
+					// { type:"button", id:"resultOpen", caption:"정상", icon:'fas fa-check-circle'},
+				],
+				onClick: function(evt){
+					var _id= evt.target;
+					console.log(_id);
+					// if(_id === "resultOpen" || _id === "resultClosed"){
+					// 	$("#grid_grid_column_5").trigger("click");
+					// 	$("#grid_grid_column_5").hasClass('w2ui-sort-down');
+					// }
+
+
+					// var _sortOpen= $("#grid_grid_column_5").hasClass('w2ui-sort-down');
+					// var _sortClose = $("#grid_grid_column_5").hasClass('w2ui-sort-up');
+					// if(_id === "resultClosed" && _sortClose && !_sortOpen){			
+					// 	w2ui["grid"].columnClick('result',event)
+					// }
+					// else if(_id === "resultOpen" && !_sortClose && _sortOpen){
+					// 	w2ui["grid"].columnClick('result',event)
+					// }
+					
+					if(_id === "w2ui-search-advanced"){
+						setTimeout(function(){
+							_this.searchCustom();
+						
+						
+						}, 100);
+						$("#w2ui-overlay-grid-searchOverlay").mousedown(function(evt) {
+							if($('#w2ui-overlay').hasClass('top-arrow')){
+								$('#w2ui-overlay').remove();
+							}
+						});
+						
+					}
+
+					if(_id === 'w2ui-reload'){
+						_this.netWorkModel.fetch();
+					}
+				},
+			}
+			_this.gridName = 'grid'; 
+			$('#'+_this.gridName).w2grid({
+				name: _this.gridName, 
+				show: { 
+					toolbar: true,
+					footer: true
+				},
+				multiSearch: true,
+				//columnGroups: _columnGroups,
+				columns: _colums,
+				records:undefined,
+				recid: "id",
+				searches: _searches,
+				toolbar: _toobar
+			});
+
+			
+		},
+		searchCustom: function(){
+			var _this = this;
+			$("#grid_grid_operator_0 option[value='contains']").prop("selected",true);
+			$("#grid_grid_operator_1 option[value='contains']").prop("selected",true);
+			$("#grid_grid_operator_3 option[value='contains']").prop("selected",true);
+
+			$("input[name='comp_name']").w2field('list',{items:_this.company});
+			$("input[name='site_name']").w2field('list',{items:_this.site});
+			$("input[name='device_name']").w2field('list',{items:_this.deviceType});
+
+			$("input[name='comp_name']").attr('placeholder',"전체");
+			$("input[name='site_name']").attr('placeholder',"전체");
+			$("input[name='device_name']").attr('placeholder',"전체");
+
+
+
+		},
+		destroy: function() {
+			var _this=this;
+			var gridName = _this.gridName
+			if(w2ui.hasOwnProperty(gridName)){
+				w2ui[gridName].destroy();
+			}
+			this.undelegateEvents();
+        },
+	});
+});

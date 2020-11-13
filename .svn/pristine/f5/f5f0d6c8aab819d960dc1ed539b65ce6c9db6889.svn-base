@@ -1,0 +1,231 @@
+define([
+	"jquery",
+	"underscore",
+	"backbone",
+	"text!views/siteMonitor",
+	"css!cs/stylesheets/main.css"	
+], function(
+	$,
+	_,
+	Backbone,
+	HTML
+) { 
+    var SiteNetWorkModel = Backbone.Model.extend({ 
+		url: '/network/networks/site',
+        parse: function(result) {
+            return result;
+        }
+	});
+	
+	var DetialSiteNetModel = Backbone.Model.extend({ 
+		url: '/network/networks/site',
+        parse: function(result) {
+            return result;
+        }
+	});
+
+
+	return Backbone.View.extend({
+		el: '#layout_layout_panel_main .w2ui-panel-content',
+		company:[],
+		siteGridName: undefined,
+		detailGridName: undefined,
+		selectedRow: undefined,
+		initialize: function() {
+			console.log("siteMonitor.js");
+			this.$el.html(HTML);
+			this.siteNetWorkModel = new SiteNetWorkModel();
+			this.listenTo(this.siteNetWorkModel, "sync", this.getSiteNetWorkList);
+			this.siteNetWorkModel.fetch();
+			this.siteDrawGrid();
+			this.detailDrawGrid();
+			//this.detailDrawGrid();
+		},
+		getSiteNetWorkList: function(model) {
+			var _this=this;
+			var data = model.toJSON();
+			
+			var _siteList = Object.keys(data).map(function(i){	
+	
+					return data[i];
+			});
+
+			console.log(_siteList);
+
+			w2ui[_this.siteGridName].records=_siteList;
+			w2ui[_this.siteGridName].render();
+			var toDate = new Date().toLocaleString();
+			_this.$el.find('#grid_'+_this.siteGridName+'_footer .w2ui-footer-left').html(toDate);
+			
+
+			//수정 사항( 기타 제거 임시....!!!!!!!)
+			w2ui[_this.siteGridName].remove(5);
+			///////////////////////////////////
+
+
+		},
+		getDetialSiteNetList: function(model) {
+			var _this=this;
+			var data = model.toJSON();
+			var _detailList = Object.keys(data).map(function(i){
+				var errorTime = data[i]["error_time"];
+				if(errorTime){
+					var errorDate =new Date(data[i]["error_time"]);
+					var _error_time = errorDate.toLocaleString();
+					data[i].error_time = '<span id="errorDate" style="color:red;">'+_error_time+'</span>'
+					var _termDate =_this.termCalc(errorDate);
+					data[i].error_delay_time = _termDate;
+				}
+				if(_url && _port){
+					var _connect = '<a href="'+_connURL+'" target="_blank"><i class="fas fa-link"></i></a>'
+					data[i].connURL = _connect;  
+				}
+				var _url = data[i]["url"];
+				var _port = data[i]["port"];
+				var _connURL = 'http://'+_url+":"+_port;
+				if(_url && _port){
+					var _connect = '<a href="'+_connURL+'" target="_blank"><i class="fas fa-link"></i></a>'
+					data[i].connURL = _connect;  
+				}
+				var _result = data[i]["result"];
+				var _iconClaz="";
+				if(_result){
+					if(_result === "closed"){
+						_iconClaz ="fa-times-circle";
+						_color ="#FD0100";
+					}
+					else if(_result === "open"){
+						_iconClaz ="fa-check-circle";
+						_color ="#21DF00";
+					}
+					var resultIcon = '<i class="fas '+_iconClaz+'" style="color:'+_color+';"></i>';
+					data[i].result = resultIcon;
+				}
+				
+
+				return data[i];
+			});
+
+			console.log(_detailList);
+			w2ui[_this.detailGridName].clear();
+			w2ui[_this.detailGridName].records=_detailList;
+			w2ui[_this.detailGridName].render();
+
+	
+		},
+		siteDrawGrid: function() {
+			var _this = this;
+			//var _records=data;
+			var _columnGroups = [
+				{ caption: '사이트', master:true },
+				{ caption: '연결', master:true },
+				{ caption: '설치된 디바이스 수량', span: 6 },
+			];
+			var _colums = [
+				{ field: 'site_name', caption: '사이트', size: '25%', sortable: true, attr:"align=left;" },
+				{ field: 'connectUrl', caption: '연결', size: '10%', sortable: true, attr:"align=center" },
+				{ field: 'BLE_SCANNER', caption: 'BLE 스캐너', size: '10%', attr:"align=center" },
+				{ field: 'CCTV', caption: 'CCTV', size: '10%', attr:"align=center" },
+				{ field: 'NVR', caption: 'NVR', size: '10%', attr:"align=center"},
+				{ field: 'GAS', caption: '유해가스', size: '10%',sortable: true, attr:"align=center" },
+				{ field: 'UPS', caption: 'UPS', size: '10%', sortable: true, attr:"align=center" },
+				{ field: 'SERVER', caption: '서버', size: '10%',attr:"align=center" }
+			];
+
+			_this.siteGridName = 'siteGrid';
+			$('#siteGrid').w2grid({
+				name: _this.siteGridName, 
+				header: '사이트(통합안전시스템)',
+				show: { header: true, footer: true },
+				columnGroups: _columnGroups,
+				columns: _colums,
+				multiSearch: true,
+				records:undefined,
+				recid: "id",
+				onClick: function(event){
+					var grid = this;
+					var temp = event; //클릭 된 column의 recid
+					var _getRecid = event.recid;
+					
+					var _getRow = w2ui['siteGrid'].get(_getRecid);
+					var _getId = _getRow.id;
+					_this.detailRead(_getId);
+
+				}
+			});
+
+		},
+		detailDrawGrid: function() {
+			var _this = this;
+			//var _records=data || undefined;
+			var _colums = [
+				{ field: 'device_name', caption: '타입', size: '10%', sortable: true, attr:"align=right" },
+				{ field: 'location', caption: '설치위치(상세설명)', size: '30%', sortable: true, attr:"align=left" },
+				{ field: 'connURL', caption: '연결', size: '10%', attr:"align=center" },
+				{ field: 'result', caption: '상태', size: '10%', attr:"align=center" },
+				{ field: 'error_time', caption: '장애발생일시', size: '20%', attr:"align=center", style:"bacground-color:red"},
+				{ field: 'error_delay_time', caption: '장애발생누적시간', size: '20%',sortable: true, attr:"align=right" }
+			];
+
+			_this.detailGridName = "detialGrid"
+			$('#detailGrid').w2grid({
+				name: _this.detailGridName, 
+				header: '디바이스',
+				show: { header: true, footer: true },
+				columns: _colums,
+				multiSearch: true,
+				records:undefined,
+				recid: "id",
+			
+			});
+			
+		},
+		detailRead: function(id){
+			var _this = this;
+			var _id = id;
+			var model = new DetialSiteNetModel();
+			model.url += "/"+_id;
+			model.fetch({
+				success: function(model, response){
+					console.log(model)
+					_this.getDetialSiteNetList(model);
+				}
+			}); 
+			
+		},
+		termCalc: function(param){
+			var _fromDate = param;
+	
+			var toDay = new Date();
+			var fromDay = new Date(_fromDate.getFullYear(), _fromDate.getMonth(), _fromDate.getDate(),_fromDate.getHours(),_fromDate.getMinutes());
+			strPeriod = toDay.getTime() - fromDay.getTime();
+			pDay = strPeriod / (60*60*24*1000);
+			strDay = Math.floor(pDay);
+			pHour = (strPeriod - (strDay * (60*60*24*1000))) / (60*60*1000);
+			strHour = Math.floor(pHour);
+			strMinute = Math.floor((strPeriod - (strDay * (60*60*24*1000)) - (strHour * (60*60*1000))) / (60*1000));
+			
+			var termCalcDate;
+			if(strDay > 0){
+				termCalcDate = strDay + " 일 " + strHour + " 시간 " + strMinute + " 분";
+			}else{
+				termCalcDate = strHour + " 시간 " + strMinute + " 분";
+			}
+
+			
+			return termCalcDate;
+		},
+		destroy: function() {
+			var _this=this;
+			var siteGridName = _this.siteGridName;
+			var detailGridName = _this.detailGridName;
+			if(w2ui.hasOwnProperty(siteGridName)){
+				w2ui[siteGridName].destroy();
+			}
+			if(w2ui.hasOwnProperty(detailGridName)){
+				w2ui[detailGridName].destroy();
+			}
+        	this.undelegateEvents();
+        },
+	});
+});

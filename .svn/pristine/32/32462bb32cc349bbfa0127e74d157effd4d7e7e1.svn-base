@@ -1,0 +1,391 @@
+define([
+	"jquery",
+	"underscore",
+	"backbone",
+	"text!views/device_mgt",
+	"text!views/w2uiForm",
+	"css!cs/stylesheets/main.css"
+], function (
+	$,
+	_,
+	Backbone,
+	HTML,
+	w2uiForm
+) {
+	var NetWorkModel = Backbone.Model.extend({
+		url: '/network/networks',
+		parse: function (result) {
+			return result;
+		}
+	});
+	var CompanyModel = Backbone.Model.extend({
+		url: '/company/companies',
+		parse: function (result) {
+			return result;
+		}
+	});
+
+	var SiteModel = Backbone.Model.extend({
+		url: '/site/sites',
+		parse: function (result) {
+			return result;
+		}
+	});
+
+	var DeviceTypeModel = Backbone.Model.extend({
+		url: '/device/devices',
+		parse: function (result) {
+			return result;
+		}
+	});
+
+	return Backbone.View.extend({
+		el: '#layout_layout_panel_main .w2ui-panel-content',
+		company: undefined,
+		site: undefined,
+		deviceType: undefined,
+		gridName: undefined,
+		formName: undefined,
+		newGridName: undefined,
+		initialize: function () {
+			console.log("device.js");
+			this.$el.html(HTML);
+
+			this.netWorkModel = new NetWorkModel();
+			this.listenTo(this.netWorkModel, "sync", this.getNetWorkList);
+			this.netWorkModel.fetch();
+
+
+			this.drawGrid();
+			this.drawNewGrid();
+			this.drawForm();
+
+		},
+		getNetWorkList: function (model) {
+			var _this = this;
+			var data = model.toJSON();
+			//var _records=Object.values(data);
+			console.log(data);
+			var _records = Object.keys(data).map(function (i) {
+				var _siteName = data[i]["site_name"];
+				if (_siteName === "기타") {
+					data[i].site_name = "";
+				}
+				console.log(data[i]);
+				return data[i];
+			});
+			console.log(_records);
+
+			w2ui[_this.gridName].records = _records;
+			w2ui[_this.gridName].render();
+
+			var toDate = new Date().toLocaleString();
+			_this.$el.find('#grid_' + _this.gridName + '_footer .w2ui-footer-left').html(toDate);
+
+		},
+		drawGrid: function () {
+			var _this = this;
+
+			var _colums = [
+				{ field: 'id', caption: 'ID', size: '10%', sortable: true, attr: "align=right" },
+				{ field: 'comp_name', caption: '공급업체', size: '25%', sortable: true, attr: "align=right" },
+				{ field: 'site_name', caption: '사이트', size: '30%', attr: "align=left" },
+				{ field: 'location', caption: '설치위치(상세설명)', size: '50%', attr: "align=left" },
+				{ field: 'device_name', caption: '타입', size: '15%', attr: "align=center" },
+			];
+
+			var _toobar = {
+				items: [
+					{ type: "button", id: "deleteBtn", caption: "Delete", icon: 'fas fa-times-circle' },
+				],
+				onClick: function (evt) {
+					console.log(evt.target);
+					var target = evt.target;
+					if (target === 'w2ui-reload') {
+						_this.netWorkModel.fetch();
+					}
+					if (target === 'deleteBtn') {
+						var selectIdArr = w2ui[_this.gridName].getSelection();
+						var _selectIdCnt = selectIdArr.length;
+						if (_selectIdCnt) {
+							var options = {
+								msg: "선택 된 " + _selectIdCnt + "개 데이터를 삭제하시겠습니까?",
+								title: 'Confirmation',
+								width: 450,
+								height: 220,
+								btn_yes: {
+									text: '확인',
+									class: '',
+									style: 'background-image:linear-gradient(#73b6f0 0,#2391dd 100%); color: #fff',
+									callBack: function () {
+										console.log("yes");
+										for (var i in selectIdArr) {
+											_this.delete(selectIdArr[i]);
+										}
+									}
+								},
+								btn_no: {
+									text: '취소',
+									class: '',
+									style: '',
+									callBack: function () {
+										console.log("no");
+									}
+								},
+								callBack: null
+							};
+							w2confirm(options);
+
+						} else {
+							w2alert("삭제할 데이터를 선택하세요");
+						}
+					}
+				},
+			};
+			var _searches = [
+				{ field: 'comp_name', caption: "공급업체", type: "text" }
+			]
+
+
+			_this.gridName = 'deviceGrid';
+			$('#deviceGrid').w2grid({
+				name: _this.gridName,
+				show: {
+					toolbar: true,
+					footer: true,
+					selectColumn: true
+				},
+				columns: _colums,
+				records: undefined,
+				recid: "id",
+				toolbar: _toobar,
+				multiSearch: false,
+				searches: _searches,
+				onClick: function (event) {
+					var grid = this;
+					var form = w2ui[_this.formName];
+					event.onComplete = function () {
+						var sel = grid.getSelection();
+						if (sel.length == 1) {
+							form.grid = sel[0];
+							form.record = $.extend(true, {}, grid.get(sel[0]));
+							form.refresh();
+						} else {
+							form.clear();
+						}
+					}
+				}
+			});
+
+
+		},
+		drawForm: function () {
+			var _this = this;
+
+			var _header = '디바이스 정보';
+			var _fields = [
+				{ name: 'id', type: 'text', html: { attr: 'style="width: 90px"' } },
+				{ name: 'comp_name', type: 'list', required: true, options: { items: window.companyCombo } },
+				{ name: 'site_name', type: 'list', required: true,options: { items: window.siteCombo } },
+				{ name: 'device_name', type: 'list', required: true,options: { items: window.deviceCombo } },
+				{ name: 'url', type: 'text', required: true },
+				{ name: 'port', type: 'text', required: true },
+				{ name: 'location', type: 'text' }
+			]
+			var _actions = {
+				reset: function () {
+					this.clear();
+				},
+				save: function (event) {
+					var form = w2ui[_this.formName];
+					var _record = form.record;
+					var _id = _record.id;
+					var networkObj = {};
+					networkObj.url = _record.url;
+					networkObj.port = _record.port;
+					networkObj.deviceId = _record.device_name["value"];
+					networkObj.device_name = _record.device_name["text"];
+					networkObj.location = _record.location;
+					networkObj.companyId = _record.comp_name["value"];
+					networkObj.comp_name = _record.comp_name["text"];
+					networkObj.siteId = _record.site_name ? _record.site_name["value"] : 5;
+					networkObj.site_name = _record.site_name ? _record.site_name["text"] : '기타';
+					console.log(networkObj);
+					if (_id) {
+						networkObj.id = _record.id;
+						var options = {
+							msg: "선택 된 데이터를 수정하시겠습니까?",
+							title: 'Confirmation',
+							width: 450,
+							height: 220,
+							btn_yes: {
+								text: '확인',
+								class: '',
+								style: 'background-image:linear-gradient(#73b6f0 0,#2391dd 100%); color: #fff',
+								callBack: function () {
+									_this.update(networkObj);
+
+								}
+							},
+							btn_no: {
+								text: '취소',
+								class: '',
+								style: '',
+								callBack: function () {
+								}
+							},
+							callBack: null
+						};
+						w2confirm(options);
+
+					} else {
+						_this.insert(networkObj);
+					}
+
+					//this.save(); 
+				}
+			}
+			_this.formName = "inputForm";
+			_this.$el.find('#inputForm').w2form({
+				name: _this.formName,
+				header: _header,
+				formHTML: w2uiForm,
+				fields: _fields,
+				actions: _actions
+
+			});
+
+			//_this.formCustom();
+
+
+		},
+		formCustom: function () {
+			var _this = this;
+			_this.$el.find('#connect-btn').prop({ "type": "button", "value": "확인" });
+			_this.$el.find('#connect-btn').css({ "height": "24px", "width": "96px" });
+
+		},
+		drawNewGrid: function () {
+			var _this = this;
+			var _colums = [
+				{ field: 'id', caption: 'ID', size: '10%', sortable: true, attr: "align=right" },
+				{ field: 'comp_name', caption: '공급업체', size: '20%', sortable: true, attr: "align=right" },
+				{ field: 'site_name', caption: '사이트', size: '30%', attr: "align=left" },
+				{ field: 'location', caption: '설치위치(상세설명)', size: '40%', attr: "align=left" },
+				{ field: 'device_name', caption: '타입', size: '10%', attr: "align=center" },
+			];
+			_this.newGridName = 'newDeviceGrid';
+			$('#newDeviceGrid').w2grid({
+				name: _this.newGridName,
+				columns: _colums,
+				multiSearch: true,
+				records: undefined,
+				recid: "id",
+
+			});
+
+
+		},
+		insert: function (obj) {
+			var _this = this;
+			var model = new NetWorkModel();
+			model.set(obj);
+			model.save({}, {
+				success: function (model, response) {
+					var _result = model.toJSON();
+					if (_result["site_name"] === '기타') {
+						_result["site_name"] = "";
+					}
+					w2ui[_this.gridName].add(_result);
+					w2ui[_this.newGridName].add(_result);
+					w2ui[_this.formName].clear();
+
+				},
+				error: function (model, response) {
+
+				}
+			});
+		},
+		dataCustom: function (x, y) {
+
+		},
+		update: function (obj) {
+			var _this = this;
+			var model = new NetWorkModel();
+			model.url += "/" + obj.id;
+			model.set(obj);
+			model.save({}, {
+				success: function (model, response) {
+					var result = model.toJSON();
+					//_this.netWorkModel.fetch();
+					if (result["site_name"] === '기타') {
+						result["site_name"] = "";
+					}
+					w2ui[_this.gridName].set(result.id, result);
+					w2ui[_this.formName].clear();
+
+				},
+				error: function (model, response) {
+
+				}
+			});
+		},
+		delete: function (id) {
+			var _this = this;
+			console.log(id);
+			var _id = id || 0;
+			w2ui[_this.gridName].remove(_id);
+			var obj = {};
+			obj.id = _id;
+			var model = new NetWorkModel();
+			model.set(obj);
+			model.url += "/" + _id;
+			console.log(model.url);
+			model.destroy({
+				success: function (model, response) {
+					console.log("success");
+					//_this.netWorkModel.fetch();
+
+				},
+				error: function () {
+
+				},
+			});
+		},
+		destroy: function () {
+			var _this = this;
+			var gridName = _this.gridName;
+			var formName = _this.formName;
+			var newGridName = _this.newGridName;
+
+			if (w2ui.hasOwnProperty(gridName)) {
+				w2ui[gridName].destroy();
+			}
+			if (w2ui.hasOwnProperty(formName)) {
+				w2ui[formName].destroy();
+			}
+			if (w2ui.hasOwnProperty(newGridName)) {
+				w2ui[newGridName].destroy();
+			}
+			this.undelegateEvents();
+		},
+		events: {
+			"click #connect-btn": "connectCheck",
+			"click .cancle-btn": "delectlistener"
+		},
+		connectCheck: function (event) {
+			var _this = this;
+			var _url = _this.$el.find("input[name=url]").val();
+			var _port = _this.$el.find("input[name=port]").val();
+			if (_url && _port) {
+				var _connUrl = "http://" + _url + ":" + _port;
+				window.open(_connUrl);
+			}
+
+
+		},
+		delectlistener: function () {
+			console.log("delete");
+		}
+	});
+});

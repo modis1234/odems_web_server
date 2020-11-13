@@ -1,0 +1,83 @@
+.w2ui-panel-content .wrapper {
+    height: 100%;
+}
+
+.w2ui-panel-content .container {
+    width: 100%;
+    height: 100%;
+}
+.w2ui-panel-content .container .container-top-box {
+    height: 10%;
+}
+
+.w2ui-panel-content .container .container-bottom-box {
+    height: 90%;
+}
+.w2ui-overlay .w2ui-grid-searches table td.operator {
+    display: none ;
+}
+
+.container-bottom-box div#siteGrid {
+    float: left;
+}
+
+.container-bottom-box div#detailGrid {
+    float: right;
+}
+/* 디바이스 조회 */
+#tb_grid_toolbar_item_w2ui-search{
+    display: none !important;
+}
+
+/* 디바이스관리 */
+.container-bottom-box .left-box {
+    float: left;
+    width: 50%;
+    height: 90%;
+}
+.container-bottom-box .right-box {
+    float: right;
+    width: 50%;
+    height: 90%;
+}
+.container-bottom-box .right-box .right-top-box {
+    width: 100%;
+    height: 60%;
+
+}
+.container-bottom-box .right-box .right-bottom-box {
+    width: 100%;
+    height: 40%;
+
+}
+
+#inputForm .w2ui-field:nth-child(1)>div::after{
+    content:'*자동등록합니다.';
+}
+#inputForm .w2ui-field:nth-child(2)>div::after{
+    content:'*공급업체와 사이트는 함께 등록할 수 있습니다.';
+}
+
+/* .w2ui-field:nth-child(5)>div::after{
+    content:'*ex) http://~.';
+} */
+#inputForm .w2ui-field:nth-child(6)>div::after{
+    content:'*숫자만 입력가능합니다.';
+}
+#inputForm .w2ui-field:nth-child(7)>div::after{
+    content:'*URL,PORT 등록후 버튼을 눌러 확인해주세요.';
+}
+#inputForm .w2ui-field>div::after{
+    position: absolute;
+    margin-top: 7px;
+    margin-left: 16px;
+    color: red;
+}
+ 
+/* w2uiForm.html */
+
+.w2ui-buttons #sava-btn{
+    background-image: linear-gradient(#73b6f0 0,#2391dd 100%);
+    color: #fff;
+}
+

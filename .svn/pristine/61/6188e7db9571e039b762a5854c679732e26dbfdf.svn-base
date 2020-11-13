@@ -1,0 +1,297 @@
+define([
+	"jquery",
+	"underscore",
+	"backbone",
+	"text!views/upsMonitor",
+	"css!cs/stylesheets/main.css"	
+], function(
+	$,
+	_,
+	Backbone,
+	HTML
+) { 
+	var UpsModel = Backbone.Model.extend({
+		url: '/ups/upses',
+		parse: function(result) {
+			return result;
+		}
+	});
+
+
+	return Backbone.View.extend({
+		el: '#layout_layout_panel_main .w2ui-panel-content',
+		config: {
+			grid: {
+				name: 'networkGrid', 
+				show: { 
+					toolbar: true,
+					footer: true
+				},
+				multiSearch: true,
+				columns: [
+					{ field: 'comp_name', caption: '건설사', size: '8%', sortable: true, attr:"align=right" },
+					{ field: 'site_name', caption: '현장', size: '13%', sortable: true, attr:"align=right" },
+					{ field: 'location', caption: '설치위치(상세설명)', sortable: true, size: '17%', attr:"align=left" },
+					{ field: 'loaded', caption: '부하량(%)', sortable: true, size: '8%', attr:"align=center" },
+					{ field: 'battery_remain', caption: '배터리잔량(%)', sortable: true, size: '8%', attr:"align=center" },
+					{ field: 'ups_status', caption: '전원상태', sortable: true, size: '5%', attr:"align=center" },
+					{ field: 'blackout_time', caption: '보조 전원사용시작', sortable: true, size: '12%', attr:"align=right" },
+					{ field: 'batteryUsed_time', caption: '사용시간', sortable: true, size: '12%', attr:"align=right" },
+					{ field: 'discharge_time', caption: '배터리방전', sortable: true, size: '12%', attr:"align=right" },
+					{ field: 'ups_delay_time', caption: '장애누적시간', sortable: true, size: '12%', attr:"align=right" },
+					{ field: 'network_status', caption: '통신상태', sortable: true, size: '5%', attr:"align=center" },
+					{ field: 'error_time', caption: '통신장애발생', sortable: true, size: '12%', attr:"align=right" },
+					{ field: 'network_delay_time', caption: '통신장애누적시간', sortable: true, size: '12%', attr:"align=right" }
+
+				],
+				records:undefined,
+				recid: "id",
+				searches: [
+					// { field: 'comp_name', caption: '건설사', type:'list', options: { items: window.main.companyCombo } },
+					{ field: 'site_name', caption: '현장', type:'list', options: { items: window.main.siteCombo, match:'contains' } },
+					{ field: 'location', caption: '설치위치(상세설명)', type:'text' }
+				],
+				columnGroups: [
+					{ caption: 'UPS 정보', span: 5 },
+					{ caption: '점검', span: 5 },
+					{ caption: 'PHPoC 통신점검', span: 3 }
+				],
+				toolbar: {
+					items: [
+						// { type:"button", id:"resultClosed",caption:"장애발생", icon:'fas fa-times-circle'},
+						// { type:"button", id:"resultOpen", caption:"정상", icon:'fas fa-check-circle'},
+					],
+					onClick: function(evt){
+						var target = evt.target;
+						if(target === 'w2ui-reload'){
+							clearInterval(window.main.view.interval);
+							window.main.view.upsModel.fetch();
+						}
+					}
+				}
+			
+			}
+		},
+		initialize: function() {
+			this.$el.html(HTML);	
+			var _this = this;
+			this.upsModel = new UpsModel();
+			this.listenTo(this.upsModel, "sync", this.getUpsList);
+			this.upsModel.fetch();
+			this.drawGrid();
+
+		},
+		getUpsList: function(model, response){
+			var _this =this;
+			var upsList = response;
+			
+
+			var records =[];
+			for( i in upsList ){
+				var upsObj = {};
+				upsObj = {
+					comp_name: undefined,
+					site_name: undefined,
+					location: undefined,
+					loaded:undefined,
+					battery_remain: undefined
+				};
+				upsObj['comp_name'] = upsList[i]['comp_name'];
+				upsObj['site_name'] = upsList[i]['site_name'];
+
+				upsObj['location'] = upsList[i]['location'];
+				upsObj['loaded'] = upsList[i]['loaded'];
+				upsObj['battery_remain'] = upsList[i]['battery_remain'];
+				upsObj['id'] = upsList[i]['id'];
+				upsObj['ups_status'] = '<i class="fas fa-check-circle" style="color:#21DF00;"></i>';
+				upsObj['network_status'] = '<i class="fas fa-check-circle" style="color:#21DF00;"></i>';
+				upsObj['blackout_time'] =null;
+				upsObj['batteryUsed_time'] =null;
+				upsObj['discharge_time'] =null;
+				upsObj['ups_delay_time'] =null;
+				upsObj['error_time'] =null;
+				upsObj['network_delay_time'] = null;
+
+				records.push(upsObj);
+
+			} // end for
+
+
+			var gridName = _this.config.grid['name'];
+			window.w2ui[gridName].records=records;
+			window.w2ui[gridName].render();
+
+			_this.setUPSRender();
+			this.interval = setInterval(function(){
+				_this.setUPSRender();
+			},10000);
+
+
+			var date = new Date();
+            var toYear = date.getFullYear();
+            var tempMonth = date.getMonth()+1;
+            var toMonth = tempMonth >= 10 ? tempMonth : '0'+tempMonth;
+            var tempDate = date.getDate();
+            var toDate = tempDate >= 10 ? tempDate : '0'+tempDate;
+
+            var toHour = date.getHours() >= 10 ? date.getHours() : '0'+date.getHours();
+            var toMinute = date.getMinutes() >= 10 ? date.getMinutes() : '0'+date.getMinutes();
+            var toSec = date.getSeconds() >= 10 ? date.getSeconds() : '0'+date.getSeconds();
+
+            var currentDate = toYear+'-'+toMonth+'-'+toDate+' '+toHour+':'+toMinute+':'+toSec;
+
+           _this.$el.find('.w2ui-footer-left').text(currentDate);
+			// window.w2ui[gridName].on('refresh:after', function (event) {
+            //     _this.$el.find('.w2ui-footer-left').text(currentDate);
+            // });
+
+	
+		},
+		setUPSRender: function(){
+			var _this = this;
+			var model = new UpsModel();
+			model.url += '/odms/status'
+			model.fetch({
+				success: function(model, response){
+					var upsList = response;
+					for( i in upsList){
+						var upsObj={};
+						var blackoutTime = upsList[i]['blackout_time'] ? upsList[i]['blackout_time'] : null;
+						var dischargeTime = upsList[i]['discharge_time'] ? upsList[i]['discharge_time'] : null;
+						var errorTime = upsList[i]['error_time'] ? upsList[i]['error_time'] : null;
+						
+		
+						var errorType = upsList[i]['ups_error_type'];
+						if( errorType === 0 ){
+							upsObj['ups_status'] = '<i class="fas fa-check-circle" style="color:#21DF00;"></i>';
+							upsObj['network_status'] = '<i class="fas fa-check-circle" style="color:#21DF00;"></i>';
+							upsObj['blackout_time'] =null;
+							upsObj['batteryUsed_time'] =null;
+							upsObj['discharge_time'] =null;
+							upsObj['ups_delay_time'] =null;
+							upsObj['error_time'] =null;
+							upsObj['network_delay_time'] = null;
+						}
+						else if( errorType === 1 ){ //정전
+							upsObj['ups_status'] = '<i class="fas fa-battery-three-quarters" style="color:#FF0000;"></i>';
+							upsObj['network_status'] = '<i class="fas fa-check-circle" style="color:#21DF00;"></i>';
+		
+							var _delayTime = _this.periodTime(blackoutTime, null);
+							upsObj['batteryUsed_time'] = '<p style="color:#516173">'+_delayTime +'</p>';
+							blackoutTime = blackoutTime.substr(0, blackoutTime.indexOf(':',14));
+							blackoutTime = blackoutTime.replace('T', ' | ');
+							upsObj['blackout_time'] = '<p style="color:#516173">'+blackoutTime+'</p>';
+		
+		
+						}
+						else if( errorType === 2 ){ //방전
+							//ups
+							upsObj['ups_status'] = '<i class="fas fa-times-circle" style="color:#FD0100;"></i>';
+							var blackout_delayTime = _this.periodTime(blackoutTime, null);
+							upsObj['batteryUsed_time'] = '<p style="color:#516173">'+blackout_delayTime +'</p>';
+							blackoutTime = blackoutTime.substr(0, blackoutTime.indexOf(':',14));
+							blackoutTime = blackoutTime.replace('T', ' | ');
+							upsObj['blackout_time'] = '<p style="color:#516173">'+blackoutTime+'</p>';
+							
+							var discharge_delayTime = _this.periodTime(dischargeTime, null);
+							upsObj['ups_delay_time'] = '<p style="color:#516173">'+discharge_delayTime+'</p>';
+							dischargeTime = dischargeTime.substr(0, dischargeTime.indexOf(':',14));
+							dischargeTime = dischargeTime.replace('T', ' | ');
+							upsObj['discharge_time'] = '<p style="color:#FF0000">'+dischargeTime+'</p>';
+							
+							//네트워크
+							upsObj['network_status'] = '<i class="fas fa-times-circle" style="color:#FD0100;"></i>';
+							var networks_delayTime = _this.periodTime(errorTime, null);
+							upsObj['network_delay_time'] = '<p style="color:#516173">'+networks_delayTime+'</p>';
+							errorTime = errorTime.substr(0, errorTime.indexOf(':',14));
+							errorTime = errorTime.replace('T', ' | ');
+							upsObj['error_time'] = '<p style="color:#FF0000">'+errorTime+'</p>';
+		
+						}
+						else if( errorType === 3 ){ //네트워크 장애
+							upsObj['ups_status'] = '<i class="fas fa-times-circle" style="color:#FD0100;"></i>';
+							
+							var stateLine = upsList[i]['state_line']['data'][0];
+							if( stateLine == 1 ){
+								upsObj['ups_status'] = '<i class="fas fa-battery-three-quarters" style="color:#FF0000;"></i>';
+								var _delayTime = _this.periodTime(blackoutTime, null);
+								upsObj['batteryUsed_time'] = '<p style="color:#516173">'+_delayTime +'</p>';
+								blackoutTime = blackoutTime.substr(0, blackoutTime.indexOf(':',14));
+								blackoutTime = blackoutTime.replace('T', ' | ');
+								upsObj['blackout_time'] = '<p style="color:#516173">'+blackoutTime+'</p>';
+							} else {
+								upsObj['ups_status'] = '<i class="fas fa-check-circle" style="color:#21DF00;"></i>';
+							}
+		
+							upsObj['network_status'] = '<i class="fas fa-times-circle" style="color:#FD0100;"></i>';
+							var networks_delayTime = _this.periodTime(errorTime, null);
+							upsObj['network_delay_time'] = '<p style="color:#516173">'+networks_delayTime+'</p>';
+							errorTime = errorTime.substr(0, errorTime.indexOf(':',14));
+							errorTime = errorTime.replace('T', ' | ');
+							upsObj['error_time'] = '<p style="color:#FF0000">'+errorTime+'</p>';
+						}
+
+						var _id = upsList[i]['id'];
+						var gridName=_this.config.grid['name'];
+						window.w2ui[gridName].set(_id,upsObj);
+
+					} // end for
+
+
+					
+				},
+				error: function(){
+
+				}
+
+			});
+		},
+		drawGrid: function(){
+			var _this =this;
+			var options = _this.config.grid;
+			$('#grid').w2grid(options);
+		},
+		periodTime: function(startDate, endDate){
+            var fromDate = new Date(startDate);
+            var toDate =endDate ? new Date(endDate):new Date;
+
+            periodTime = toDate.getTime()-fromDate.getTime();
+            pDay = periodTime / (60*60*24*1000); 
+            strDay = Math.floor(pDay); // 일
+            pHour = (periodTime-(strDay * (60*60*24*1000))) / (60*60*1000);
+            strHour = Math.floor(pHour);
+            strMinute = Math.floor((periodTime - (strDay * (60*60*24*1000)) - (strHour * (60*60*1000))) / (60*1000));
+            sec = Math.floor((periodTime % (1000 * 60)) / 1000);
+            var periodDate = '';
+          
+            if( strDay != 0 ){
+                periodDate = strDay + " 일 " + strHour + " 시간 " + strMinute +'분';
+            }
+            else if( strDay == 0 && strHour != 0){
+                periodDate = strHour + " 시간 " + strMinute +'분';
+            }
+            else if( strDay == 0 && strHour == 0 && strMinute > 0  ){
+                periodDate = strMinute +'분';
+            } 
+            else if(  strDay == 0 && strHour == 0 && strMinute ==0 && sec <= 1 ){
+                //periodDate = sec+'초';
+                periodDate = 0;
+            }
+
+            return periodDate;
+        },
+		destroy: function() {
+			var _this=this;
+			var gridName = _this.config.grid['name'];
+			if(w2ui.hasOwnProperty(gridName)){
+				w2ui[gridName].destroy();
+			}
+			this.undelegateEvents();
+
+			clearInterval(this.interval);
+		},
+		events: {
+			//"mouseup #grid_networkGrid_field_0":"searchItem"
+		}
+	});
+});
